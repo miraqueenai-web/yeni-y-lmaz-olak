@@ -9,6 +9,7 @@ if (!file) { console.error("Kullanım: node src/publish.js drafts/<id>.json"); p
 const draft = readJson(file);
 if (!draft) { console.error("Taslak okunamadı: " + file); process.exit(1); }
 if (draft.status === "published") { console.log("Zaten yayınlanmış."); process.exit(0); }
+if (draft.status === "needs_review") { console.error("Taslak doğrulamadan geçmedi (needs_review). Kaynakları kontrol edip status alanını draft yapın."); process.exit(3); }
 if (draft.status === "blocked") { console.error("Bu taslak reklam denetiminde engellendi; yayınlanamaz."); process.exit(2); }
 
 const base = env("PUBLIC_BASE_URL", true).replace(/\/$/, "");   // ör. https://KULLANICI.github.io/DEPO

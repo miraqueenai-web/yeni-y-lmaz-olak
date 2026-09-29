@@ -3,7 +3,8 @@
 Haftada 3 gün (varsayılan: **Pzt Google İşletme · Çar Instagram · Cum LinkedIn**, 09:00 İstanbul) şunları yapar:
 
 1. Envanterde **olmayan** yeni konuyu seçer (`data/queue.txt` → yoksa Claude önerir; 4 platform için çakışma kontrolü).
-2. İsteğe bağlı web taramasıyla güncel mevzuatı çeker, platforma uygun metni yazar (Google ≤1500 kr otomatik kısaltma).
+2. **Zorunlu** web araştırması yapar (Resmî Gazete/mevzuat/Yargıtay kaynaklı, kaynak URL'leri taslağa kaydedilir). Kaynak bulunamazsa hafızadan yazmaz, durur. Konu kuyrukta yoksa "Yasa Radarı" son 45 günün gelişmelerinden yeni konu seçer. Sonra metni yazar (Google ≤1500 kr otomatik kısaltma).
+2b. **Doğruluk denetimi**: metindeki her madde/tarih/süre/künye araştırmayla karşılaştırılır; desteklenmeyen iddia düzeltilir, düzelmezse taslak `needs_review` olur ve yayınlanmaz.
 3. **Reklam yasağı denetimi** (Av.K. m.55 / TBB Yön.) yapar; ihlal varsa düzeltir, düzelmezse yayını **engeller**.
 4. Şablonunuzdan 1080×1080 görseli üretir (Canva yerine; `assets/template.png` koyun).
 5. `config.json` → `mode`:
