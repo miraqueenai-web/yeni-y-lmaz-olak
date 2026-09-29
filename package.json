@@ -1,0 +1,17 @@
+{
+  "name": "yc-sosyal-medya-otomasyonu",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Yılmaz & Çolak Hukuk Bürosu — Google İşletme, Instagram ve LinkedIn için otomatik içerik üretim ve yayın sistemi",
+  "scripts": {
+    "generate": "node src/generate.js",
+    "publish": "node src/publish.js",
+    "import": "node src/importInventory.js",
+    "test": "node --test \"test/*.test.js\""
+  },
+  "engines": { "node": ">=20" },
+  "dependencies": {
+    "@napi-rs/canvas": "^0.1.65"
+  }
+}

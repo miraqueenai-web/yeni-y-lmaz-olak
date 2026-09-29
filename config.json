@@ -1,0 +1,12 @@
+{
+  "mode": "draft",
+  "timezone": "Europe/Istanbul",
+  "schedule": [
+    { "day": "Mon", "platform": "google" },
+    { "day": "Wed", "platform": "instagram", "igType": "Carousel" },
+    { "day": "Fri", "platform": "linkedin", "liMode": "alternate" }
+  ],
+  "google": { "format": "rotate", "maxChars": 1500, "targetMax": 1430 },
+  "linkUrl": "https://yilmazcolak.av.tr/online-danismanlik",
+  "focusBranches": ["AİLE HUKUKU", "CEZA HUKUKU", "İŞ HUKUKU"]
+}
