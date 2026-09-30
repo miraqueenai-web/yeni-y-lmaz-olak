@@ -557,7 +557,10 @@ export default function StudioApp() {
     if (document.fonts) Promise.all([document.fonts.load("600 66px 'Playfair Display'"), document.fonts.load("600 40px 'Cormorant Garamond'")]).then(() => document.fonts.ready).then(() => setFontReady(true)).catch(() => setFontReady(true));
     else setFontReady(true);
   }, []);
-  useEffect(() => { if (TEMPLATE_BG) { const img = new Image(); img.onload = () => setBgImg(img); img.src = TEMPLATE_BG; } }, []);
+  useEffect(() => {
+    let src = TEMPLATE_BG; try { src = localStorage.getItem("yc-template") || TEMPLATE_BG; } catch {}
+    if (src) { const img = new Image(); img.onload = () => setBgImg(img); img.src = src; }
+  }, []);
   useEffect(() => {
     (async () => {
       const raw = await store.get("yc-gbp-topics", true);
@@ -576,7 +579,7 @@ export default function StudioApp() {
 
   useEffect(() => { if (canvasRef.current && topic.trim()) drawTemplate(canvasRef.current, bgImg, topic.trim(), lawBranch, opts); }, [topic, lawBranch, bgImg, opts, fontReady, view, platform]);
   const setOpt = (k, v) => setOpts((o) => ({ ...o, [k]: v }));
-  const onUpload = (e) => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { const img = new Image(); img.onload = () => setBgImg(img); img.src = ev.target.result; }; r.readAsDataURL(f); };
+  const onUpload = (e) => { const f = e.target.files?.[0]; if (!f) return; const r = new FileReader(); r.onload = (ev) => { try { localStorage.setItem("yc-template", ev.target.result); } catch { setError("Şablon çok büyük, kalıcı kaydedilemedi (bu oturumda geçerli)."); } const img = new Image(); img.onload = () => setBgImg(img); img.src = ev.target.result; }; r.readAsDataURL(f); };
 
   const saveCustom = async (list) => { setCustom(list); await store.set("yc-gbp-topics", JSON.stringify(list), true); };
 
