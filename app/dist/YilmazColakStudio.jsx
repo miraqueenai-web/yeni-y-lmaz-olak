@@ -430,11 +430,15 @@ function drawTemplate(canvas, img, title, lawText, o) {
 const DEFAULT_OPTS = { fontFamily: "'Playfair Display', Georgia, serif", titleColor: "#ffffff", titleWeight: "600", titleSize: 66, lineHeight: 1.18, titleX: 540, titleY: 225, titleMaxW: 680, labelColor: "#2b2b2b", labelWeight: "600", labelSize: 40, labelSpacing: 9, labelX: 540, labelY: 495 };
 
 // ---------- API ----------
+const getKey = () => { try { return localStorage.getItem("yc-api-key") || ""; } catch { return ""; } };
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 async function callAPI(body, _try = 0) {
   let data;
   try {
-    const resp = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(body) });
+    const key = getKey();
+    const headers = { "Content-Type": "application/json" };
+    if (key) { headers["x-api-key"] = key; headers["anthropic-version"] = "2023-06-01"; headers["anthropic-dangerous-direct-browser-access"] = "true"; }
+    const resp = await fetch("https://api.anthropic.com/v1/messages", { method: "POST", headers, body: JSON.stringify(body) });
     data = await resp.json();
   } catch (e) { data = { error: { message: e.message } }; }
   const msg = (data?.error?.message || data?.error?.type || "").toString().toLowerCase();
@@ -541,6 +545,8 @@ export default function StudioApp() {
   const [openItem, setOpenItem] = useState(null);
   const [importText, setImportText] = useState("");
   const [fontReady, setFontReady] = useState(false);
+  const [keyOpen, setKeyOpen] = useState(() => !getKey());
+  const [keyVal, setKeyVal] = useState(getKey());
   const canvasRef = useRef(null);
   const fileRef = useRef(null);
 
@@ -718,12 +724,19 @@ Reklam yasağına uygun. En sonda SADECE şu JSON dizisini ver: [{"topic":"...",
           <div style={{ color: "rgba(255,255,255,0.55)", fontSize: 12, marginTop: 2 }}>İçerik Stüdyosu — Google · Instagram · LinkedIn</div>
         </div>
         <div style={{ display: "flex", gap: 8 }}>
+          <button onClick={() => setKeyOpen((k) => !k)} style={{ padding: "8px 14px", borderRadius: 6, border: "none", background: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)", fontSize: 13, cursor: "pointer" }}>🔑 API</button>
           {[["create", "İçerik Üret"], ["watch", `Yasa Radarı${backlog.length ? " (" + backlog.length + ")" : ""}`], ["archive", `Yayınlananlar (${totalCount})`]].map(([v, l]) => (
             <button key={v} onClick={() => setView(v)} style={{ padding: "8px 18px", borderRadius: 6, border: "none", background: view === v ? C.gold : "rgba(255,255,255,0.1)", color: view === v ? "#2a1f16" : "rgba(255,255,255,0.7)", fontWeight: 600, fontSize: 13, cursor: "pointer" }}>{l}</button>
           ))}
         </div>
       </div>
 
+      {keyOpen && <div style={{ maxWidth: 1150, margin: "16px auto 0", padding: "12px 16px", background: "#fffbeb", border: "1px solid #f5e0a3", borderRadius: 8, fontSize: 13, display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+        <b>🔑 Anthropic API anahtarı</b>
+        <input type="password" value={keyVal} onChange={(e) => setKeyVal(e.target.value)} placeholder="sk-ant-..." style={{ flex: 1, minWidth: 220, padding: "8px 10px", borderRadius: 6, border: "1px solid #ddd" }} />
+        <button onClick={() => { try { localStorage.setItem("yc-api-key", keyVal.trim()); } catch {} setKeyOpen(false); setError(""); }} style={{ ...btn, borderColor: "#27ae60", color: "#1e7e4f" }}>Kaydet</button>
+        <span style={{ fontSize: 11, color: "#92600a", flexBasis: "100%" }}>Anahtar yalnızca bu tarayıcıda saklanır (console.anthropic.com → API Keys). Claude içinde açıyorsanız boş bırakabilirsiniz.</span>
+      </div>}
       {error && <div style={{ maxWidth: 1150, margin: "16px auto 0", padding: "12px 16px", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 8, color: "#991b1b", fontSize: 13, display: "flex", gap: 12, alignItems: "center", flexWrap: "wrap" }}>
         <span style={{ flex: 1 }}>{error}</span>
         {staleOffer && <button onClick={() => generate({ ...staleOffer, skipResearch: true })} style={{ ...btn, borderColor: "#c0392b", color: "#991b1b" }}>Yine de hafızadan üret (güncel değil, künyesiz)</button>}
